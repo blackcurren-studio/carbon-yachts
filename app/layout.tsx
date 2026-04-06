@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
   title: "Carbon Yachts | Ahead. By Design.",
@@ -35,9 +37,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className="bg-zinc-950 text-zinc-100 antialiased min-h-full flex flex-col">
-        {/* <Header /> — paste Header component here */}
+        <Header />
         <main className="flex-1">{children}</main>
-        {/* <Footer /> — paste Footer component here */}
+        <Footer />
       </body>
     </html>
   );
