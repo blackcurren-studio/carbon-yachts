@@ -1,4 +1,5 @@
 import HomepageHero from "@/components/sections/HomepageHero"
+import { BrandStatement } from "@/components/sections/BrandStatement"
 import OwnershipExperience from "@/components/sections/OwnershipExperience"
 import { BoatCard } from "@/components/shared/BoatCard"
 import { ArticleCard } from "@/components/shared/ArticleCard"
@@ -139,6 +140,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* S3 — Brand Statement */}
+      <BrandStatement />
 
       {/* S4 — Ownership Experience */}
       <OwnershipExperience />
