@@ -1,4 +1,5 @@
 import HomepageHero from "@/components/sections/HomepageHero"
+import OwnershipExperience from "@/components/sections/OwnershipExperience"
 import { BoatCard } from "@/components/shared/BoatCard"
 import { ArticleCard } from "@/components/shared/ArticleCard"
 import { EnquiryForm } from "@/components/shared/EnquiryForm"
@@ -138,6 +139,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* S4 — Ownership Experience */}
+      <OwnershipExperience />
 
       {/* S5 — Latest News */}
       <section className="bg-zinc-950 py-24">
