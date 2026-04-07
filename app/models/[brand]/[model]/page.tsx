@@ -3,7 +3,7 @@ import ModelHero from "@/components/sections/ModelHero"
 import ModelHighlights from "@/components/sections/ModelHighlights"
 import SpecTable from "@/components/sections/SpecTable"
 import ConfiguratorCTA from "@/components/sections/ConfiguratorCTA"
-import { ArticleCard } from "@/components/shared/ArticleCard"
+import { ArticleCard } from "@/components/sections/ArticleCard"
 import { EnquiryForm } from "@/components/shared/EnquiryForm"
 
 // ---------------------------------------------------------------------------
