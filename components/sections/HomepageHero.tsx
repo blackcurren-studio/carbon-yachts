@@ -15,7 +15,14 @@ const dmSans: React.CSSProperties = {
   fontFamily: "'DM Sans', 'Inter', 'Helvetica Neue', Arial, sans-serif",
 }
 
-const SECOND_LINES = ["BY DESIGN.", "BY PERFORMANCE.", "BY SERVICE.", "BY PASSION."]
+const SECOND_LINES = [
+  "BY DESIGN.",
+  "BY INNOVATION.",
+  "BY PASSION.",
+  "BY PERFORMANCE.",
+  "BY CONVICTION.",
+  "BY NATURE.",
+]
 
 // Transparent 1×1 SVG — used as a logo placeholder until real assets are provided
 const LOGO_PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E"
@@ -29,45 +36,78 @@ const BRANDS = [
   { label: "CANDELA",        href: "/candela/",        logo: LOGO_PLACEHOLDER },
 ]
 
+// Animation phase: "idle" → "out" → swap text → "in" → "idle"
+type Phase = "idle" | "out" | "in"
+
 export default function HomepageHero({
   videoSrc = "",
   posterSrc = "",
 }: HeroSectionProps) {
   const [index, setIndex] = useState(0)
-  const [animating, setAnimating] = useState(false)
+  const [phase, setPhase] = useState<Phase>("idle")
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setAnimating(true)
+      // Phase 1: slide current line out upward
+      setPhase("out")
       setTimeout(() => {
+        // Phase 2: swap text while offscreen
         setIndex((prev) => (prev + 1) % SECOND_LINES.length)
-        setAnimating(false)
-      }, 350)
+        setPhase("in")
+        // Phase 3: slide new line up from below into position
+        setTimeout(() => {
+          setPhase("idle")
+        }, 400)
+      }, 380)
     }, 5000)
     return () => clearInterval(interval)
   }, [])
 
+  const lineTransform =
+    phase === "out"
+      ? "translateY(-110%)"
+      : phase === "in"
+      ? "translateY(0%)"
+      : "translateY(0%)"
+
+  const lineInitialTransform = phase === "in" ? "translateY(110%)" : undefined
+
   return (
     <section
-      className="relative min-h-screen w-full overflow-hidden bg-zinc-950 flex flex-col"
+      className="relative min-h-screen w-full overflow-hidden flex flex-col"
       aria-label="Carbon Yachts hero"
     >
       {/* ── Video Background ── */}
-      <video
-        className="absolute inset-0 w-full h-full object-cover"
-        src={videoSrc || undefined}
-        poster={posterSrc || undefined}
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-hidden="true"
-      />
+      {videoSrc && (
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src={videoSrc}
+          poster={posterSrc || undefined}
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden="true"
+        />
+      )}
 
-      {/* ── Gradient fallback ── */}
-      {!videoSrc && !posterSrc && (
+      {/* ── Fallback background — deep navy radial gradient ── */}
+      {!videoSrc && (
         <div
-          className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-zinc-950 to-black"
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 120% 80% at 60% 40%, #0f1a2e 0%, #080c14 50%, #020408 100%)",
+          }}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* ── Poster overlay when video present ── */}
+      {videoSrc && posterSrc && (
+        <div
+          className="absolute inset-0"
+          style={{ backgroundImage: `url(${posterSrc})`, backgroundSize: "cover" }}
           aria-hidden="true"
         />
       )}
@@ -76,11 +116,11 @@ export default function HomepageHero({
       <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
 
       {/* ── Content — left-aligned ── */}
-      <div className="relative z-10 flex flex-1 flex-col items-start justify-center w-full px-10 lg:px-20 gap-4 py-32">
+      <div className="relative z-10 flex flex-1 flex-col items-start justify-center w-full px-10 lg:px-20 gap-5 py-32">
 
-        {/* Tagline — above headline */}
+        {/* Subhead — above headline */}
         <p
-          className="text-sm font-light text-zinc-400 max-w-md leading-relaxed"
+          className="text-[13px] uppercase tracking-[3px] font-light text-zinc-400"
           style={dmSans}
         >
           {"Europe's"} most progressive marine brands. Chosen for Australia and New Zealand.
@@ -88,16 +128,20 @@ export default function HomepageHero({
 
         {/* Main headline */}
         <h1
-          className="font-bold uppercase text-white leading-tight text-4xl sm:text-5xl md:text-6xl"
+          className="uppercase text-white leading-tight"
           style={{
             ...raleway,
-            letterSpacing: "4px",
+            fontWeight: 900,
+            letterSpacing: "3px",
+            fontSize: "clamp(3.5rem, 9vw, 7.5rem)",
           }}
         >
           <span className="block">AHEAD.</span>
 
+          {/* Animated second line — split-flap style */}
           <span
-            className="block overflow-hidden whitespace-nowrap"
+            className="block whitespace-nowrap"
+            style={{ height: "1.05em", overflow: "hidden" }}
             aria-live="polite"
             aria-atomic="true"
           >
@@ -105,15 +149,38 @@ export default function HomepageHero({
               key={index}
               style={{
                 display: "block",
-                animation: animating
-                  ? "slideOut 0.35s ease forwards"
-                  : "slideIn 0.4s ease forwards",
+                transform: lineTransform,
+                ...(phase === "in" ? { transform: "translateY(0%)", animationName: "none" } : {}),
+                transition:
+                  phase === "out"
+                    ? "transform 0.38s cubic-bezier(0.4, 0, 0.2, 1)"
+                    : phase === "in"
+                    ? "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+                    : "none",
               }}
             >
               {SECOND_LINES[index]}
             </span>
           </span>
         </h1>
+
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row items-start gap-4 mt-2">
+          <a
+            href="/fleet/"
+            className="border border-white text-white px-7 py-3 text-[11px] uppercase tracking-[3px] transition-colors duration-200 hover:bg-white hover:text-zinc-950"
+            style={raleway}
+          >
+            EXPLORE THE FLEET
+          </a>
+          <a
+            href="/contact/"
+            className="text-zinc-300 text-[11px] uppercase tracking-[3px] py-3 transition-colors duration-200 hover:text-white"
+            style={raleway}
+          >
+            SPEAK WITH A SPECIALIST →
+          </a>
+        </div>
       </div>
 
       {/* ── Brand Logo Bar ── */}
@@ -163,18 +230,6 @@ export default function HomepageHero({
           ))}
         </ul>
       </nav>
-
-      {/* ── CSS keyframes ── */}
-      <style>{`
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateY(100%); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideOut {
-          from { opacity: 1; transform: translateY(0); }
-          to   { opacity: 0; transform: translateY(-100%); }
-        }
-      `}</style>
     </section>
   )
 }
